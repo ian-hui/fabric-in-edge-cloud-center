@@ -27,7 +27,7 @@ func uploadFilePosition(center_nodestru Nodestructure, msg []byte) (err error) {
 			return fmt.Errorf("upload error: %v", err)
 		}
 	} else {
-		if err = cc.CouchdbUpdate(file_position_info.FileId, "Position", file_position_info.Position, "position_info"); err != nil {
+		if err = cc.CouchdbUpdate(file_position_info.FileId, "FilePosition", file_position_info.FilePosition, "position_info"); err != nil {
 			return fmt.Errorf("update error: %v", err)
 		}
 	}
@@ -131,7 +131,7 @@ func UploadCiText(center_nodestru Nodestructure, msg []byte) (err error) {
 func UploadKeyPosition(center_nodestru Nodestructure, msg []byte) (err error) {
 	//receive key position
 	fmt.Println("<------upload keyposition---->")
-	var key_positon KeyPostionUploadInfo
+	var key_positon PositionInfo
 	err = json.Unmarshal(msg, &key_positon)
 	if err != nil {
 		return fmt.Errorf("unmarshal error: %v", err)
@@ -142,7 +142,7 @@ func UploadKeyPosition(center_nodestru Nodestructure, msg []byte) (err error) {
 		return fmt.Errorf("get couchdb error: %v", err)
 	}
 
-	err = cc.CouchdbUpdate(key_positon.FileId, "GroupAddrs", key_positon.GroupAddrs, "position_info")
+	err = cc.CouchdbUpdate(key_positon.FileId, "KeyGroupAddrs", key_positon.KeyGroupAddrs, "position_info")
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -163,16 +163,16 @@ func KeyReqForwarding(center_nodestru Nodestructure, msg []byte) (err error) {
 	if err != nil {
 		return fmt.Errorf("get couchdb error: %v", err)
 	}
-	resultSet, err := cc.Getinfo(freq.FileId, "position_info")
+	resultSet, err := cc.Getinfo(freq.FileId, "cipherkey_info")
 	if err != nil {
 		return fmt.Errorf("db.get error: %v", err)
 	}
-	var position_info PositionInfo
-	err = resultSet.ScanDoc(&position_info)
+	var keyinfo KeyPostionUploadInfo
+	err = resultSet.ScanDoc(&keyinfo)
 	if err != nil {
 		return fmt.Errorf("scandoc error: %v", err)
 	}
-	choosed_addr, err := loadbalance(position_info.GroupAddrs, 3)
+	choosed_addr, err := loadbalance(keyinfo.GroupAddrs, 3)
 	if err != nil {
 		return fmt.Errorf("loadbalance error: %v", err)
 	}

@@ -56,15 +56,6 @@ func (client *CouchdbClient) Create_ciphertext_info() error { //create db in cou
 	return nil
 }
 
-func (client *CouchdbClient) Create_cipherkey_info() error { //create db in couchdb
-	err := client.C.CreateDB(context.TODO(), "cipherkey_info", nil)
-	if err != nil {
-		return fmt.Errorf("create ciphertext_info db error: %v", err)
-	}
-	fmt.Println("<-------", client.C, " couchdb cipherkey_info created!------>")
-	return nil
-}
-
 func (client *CouchdbClient) Create_position_info() error { //create db in couchdb
 	err := client.C.CreateDB(context.TODO(), "position_info", nil)
 	if err != nil {
@@ -86,7 +77,7 @@ func (client *CouchdbClient) Create_position_info() error { //create db in couch
 
 func (client *CouchdbClient) CouchdbCreate(id string, m map[string]interface{}, dbname string) error {
 	// json_fileposif := structs.Map(&f) //转格式，详细看https://github.com/go-kivik/kivik
-	db := client.C.DB("ciphertext_info", nil) //连接couchdb中的cipher_info数据库
+	db := client.C.DB(dbname, nil)            //连接couchdb中的cipher_info数据库
 	rev, err := db.Put(context.TODO(), id, m) //把数据info上传到db
 	if err != nil {
 		client.CouchdbCreate(id, m, dbname)
