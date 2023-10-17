@@ -125,6 +125,7 @@ func (client *CouchdbClient) CheckNotExistence(id string, dbname string) (bool, 
 // 	return nil
 // }
 
+//把targetdata的值改为changedata
 func (client *CouchdbClient) CouchdbUpdate(id string, targetdata string, changedata interface{}, dbname string) error {
 	// client.Mu.Lock()
 	// defer client.Mu.Unlock()
@@ -142,18 +143,17 @@ func (client *CouchdbClient) CouchdbUpdate(id string, targetdata string, changed
 	case string:
 		doc[targetdata] = v
 	case []string:
-		value, ok := doc[targetdata]
+		_, ok := doc[targetdata]
 		if !ok {
 			return fmt.Errorf("field '%s' not found in doc", targetdata)
 		}
-
-		valueStrs, ok := value.([]string)
+		doc[targetdata] = v
+	case [][]string:
+		_, ok := doc[targetdata]
 		if !ok {
-			return fmt.Errorf("field '%s' is not a []string", targetdata)
+			return fmt.Errorf("field '%s' not found in doc", targetdata)
 		}
-
-		valueStrs = append(valueStrs, v...)
-		doc[targetdata] = valueStrs
+		doc[targetdata] = v
 	default:
 		return fmt.Errorf("unsupported data type: %T", v)
 	}

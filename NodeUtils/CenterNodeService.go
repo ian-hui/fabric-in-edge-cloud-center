@@ -5,6 +5,8 @@ import (
 	"fabric-go-sdk/clients"
 	"fmt"
 
+	"github.com/cloudflare/cfssl/log"
+
 	"github.com/fatih/structs"
 )
 
@@ -36,6 +38,7 @@ func uploadFilePosition(center_nodestru Nodestructure, msg []byte) (err error) {
 
 func FileReqestToCenter(center_nodestru Nodestructure, msg []byte) (err error) {
 	//receive request
+	log.Info("receive request")
 	var filereqstru FileRequest
 	err = json.Unmarshal(msg, &filereqstru)
 	if err != nil {
@@ -62,13 +65,13 @@ func FileReqestToCenter(center_nodestru Nodestructure, msg []byte) (err error) {
 			if err2 != nil {
 				return fmt.Errorf("db.get error: %v", err2)
 			}
-			var posinfo FilePositionInfoDTO
+			var posinfo PositionInfo
 			err2 = rs.ScanDoc(&posinfo)
 			if err2 != nil {
 				fmt.Println("scandoc error: ", err2)
 				return
 			}
-			err2 = ProducerAsyncSending(msg, "ReceiveFileRequestFromCenter", posinfo.Position)
+			err2 = ProducerAsyncSending(msg, "ReceiveFileRequestFromCenter", posinfo.FilePosition)
 			if err2 != nil {
 				fmt.Println("receive request producer sending error ", err2)
 				return
@@ -122,7 +125,7 @@ func UploadCiText(center_nodestru Nodestructure, msg []byte) (err error) {
 	//get rev first
 
 	//modify the position in center
-	if err = cc.CouchdbUpdate(fileinfostru.FileId, "Position", center_nodestru.KafkaAddr, "position_info"); err != nil {
+	if err = cc.CouchdbUpdate(fileinfostru.FileId, "FilePosition", center_nodestru.KafkaAddr, "position_info"); err != nil {
 		return fmt.Errorf("update error: %v", err)
 	}
 	return nil
@@ -151,7 +154,7 @@ func UploadKeyPosition(center_nodestru Nodestructure, msg []byte) (err error) {
 }
 
 // 接收密钥请求，根据元数据把请求转发到各个节点
-// TODO:负载均衡
+// 负载均衡
 func KeyReqForwarding(center_nodestru Nodestructure, msg []byte) (err error) {
 	//receive request
 	var freq FileRequest
@@ -163,22 +166,21 @@ func KeyReqForwarding(center_nodestru Nodestructure, msg []byte) (err error) {
 	if err != nil {
 		return fmt.Errorf("get couchdb error: %v", err)
 	}
-	resultSet, err := cc.Getinfo(freq.FileId, "cipherkey_info")
+	resultSet, err := cc.Getinfo(freq.FileId, "position_info")
 	if err != nil {
 		return fmt.Errorf("db.get error: %v", err)
 	}
-	var keyinfo KeyPostionUploadInfo
-	err = resultSet.ScanDoc(&keyinfo)
+	var position_info PositionInfo
+	err = resultSet.ScanDoc(&position_info)
 	if err != nil {
 		return fmt.Errorf("scandoc error: %v", err)
 	}
-	choosed_addr, err := loadbalance(keyinfo.GroupAddrs, 3)
+	choosed_addr, err := loadbalance(position_info.KeyGroupAddrs, 3)
 	if err != nil {
 		return fmt.Errorf("loadbalance error: %v", err)
 	}
 	for _, kafka_addr := range choosed_addr {
-		topic := "ReceiveKeyReq" //操作名
-		err = ProducerAsyncSending(msg, topic, kafka_addr)
+		err = ProducerAsyncSending(msg, "ReceiveKeyReq", kafka_addr)
 		if err != nil {
 			fmt.Println("producer async sending err:", err)
 			break

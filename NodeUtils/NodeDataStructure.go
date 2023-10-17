@@ -7,9 +7,9 @@ type Nodestructure struct {
 
 type PositionInfo struct {
 	// AreaId   string `json:"AreaId"`
-	FileId        string   `json:"FileId"`
-	FilePosition  string   `json:"FilePosition"`
-	KeyGroupAddrs []string `json:"KeyGroupAddrs"`
+	FileId        string     `json:"FileId"`
+	FilePosition  string     `json:"FilePosition"`
+	KeyGroupAddrs [][]string `json:"KeyGroupAddrs"`
 }
 
 type FileInfo struct {
@@ -29,18 +29,19 @@ type FileRequestDTO struct {
 	Id         string `json:"_id"`
 	Rev        string `json:"_rev"`
 }
-type FilePositionInfoDTO struct {
-	FileId   string `json:"FileId"`
-	Position string `json:"Position"`
-	AreaId   string `json:"AreaId"`
-	Rev      string `json:"_rev"`
-	Id       string `json:"_id"`
-}
 
-type KeyPostionUploadInfo struct {
-	FileId     string   `json:"FileId"`
-	GroupAddrs []string `json:"GroupAddrs"`
-}
+// type FilePositionInfoDTO struct {
+// 	FileId   string `json:"FileId"`
+// 	Position string `json:"Position"`
+// 	AreaId   string `json:"AreaId"`
+// 	Rev      string `json:"_rev"`
+// 	Id       string `json:"_id"`
+// }
+
+// type KeyPostionUploadInfo struct {
+// 	FileId     string   `json:"FileId"`
+// 	GroupAddrs []string `json:"GroupAddrs"`
+// }
 
 type DataSend2clientInfo struct {
 	TransferFlag bool   `json:"TransferFlag"`

@@ -7,9 +7,9 @@ import (
 	"net/http"
 )
 
-func GetLoadFromGroupNode(httpaddr string) (load float64, err error) {
-	resp, err := http.Get("http://" + httpaddr + "/load")
-	fmt.Println("http://" + httpaddr + "/load")
+func GetLoadFromGroupNode(linkingHost string) (load float64, err error) {
+	resp, err := http.Get("http://" + linkingHost + ":8083/load")
+	fmt.Println("http://" + linkingHost + ":8083/load")
 	if err != nil {
 		return 0, err
 	}

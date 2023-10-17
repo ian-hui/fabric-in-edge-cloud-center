@@ -3,8 +3,9 @@ package NodeUtils
 import (
 	"fabric-go-sdk/clients"
 	"fmt"
-	"log"
 	"sync"
+
+	"github.com/cloudflare/cfssl/log"
 
 	"github.com/IBM/sarama"
 )
@@ -60,10 +61,10 @@ func consumeUploadPosition(consumer sarama.Consumer, center_nodestru Nodestructu
 		select {
 		case msg := <-partitonConsumer.Messages():
 			if err := uploadFilePosition(center_nodestru, msg.Value); err != nil {
-				log.Println("uploadFilePosition error:", err)
+				log.Info("uploadFilePosition error:", err)
 			}
 		case <-partitonConsumer.Errors():
-			fmt.Println("consumerUploadPosition error")
+			log.Critical("consumerUploadPosition error")
 		}
 	}
 }
@@ -78,10 +79,10 @@ func consumeUploadCiText(consumer sarama.Consumer, center_nodestru Nodestructure
 		select {
 		case msg := <-partitonConsumer.Messages():
 			if err := UploadCiText(center_nodestru, msg.Value); err != nil {
-				log.Println("UploadCiText error:", err)
+				log.Info("UploadCiText error:", err)
 			}
 		case <-partitonConsumer.Errors():
-			fmt.Println("consumerUploadCiText error")
+			log.Critical("consumerUploadCiText error")
 		}
 	}
 }
@@ -96,10 +97,10 @@ func consumeKeyReqForwarding(consumer sarama.Consumer, center_nodestru Nodestruc
 		select {
 		case msg := <-partitonConsumer.Messages():
 			if err := KeyReqForwarding(center_nodestru, msg.Value); err != nil {
-				log.Println("KeyReqForwarding error:", err)
+				log.Info("KeyReqForwarding error:", err)
 			}
 		case <-partitonConsumer.Errors():
-			fmt.Println("consumerkeyreqforwarding error")
+			log.Critical("consumerkeyreqforwarding error")
 		}
 	}
 }
@@ -114,10 +115,10 @@ func consumeFileReqestToCenter(consumer sarama.Consumer, center_nodestru Nodestr
 		select {
 		case msg := <-partitonConsumer.Messages():
 			if err := FileReqestToCenter(center_nodestru, msg.Value); err != nil {
-				log.Println("FileReqestToCenter error:", err)
+				log.Info("FileReqestToCenter error:", err)
 			}
 		case <-partitonConsumer.Errors():
-			fmt.Println("consumeFileReqestToCenter error")
+			log.Critical("consumeFileReqestToCenter error")
 		}
 	}
 }
@@ -132,10 +133,10 @@ func consumeUploadKeyPosition(consumer sarama.Consumer, center_nodestru Nodestru
 		select {
 		case msg := <-partitonConsumer.Messages():
 			if err := UploadKeyPosition(center_nodestru, msg.Value); err != nil {
-				log.Println("UploadKeyPosition error:", err)
+				log.Info("UploadKeyPosition error:", err)
 			}
 		case <-partitonConsumer.Errors():
-			fmt.Println("consumeUploadKeyPosition error")
+			log.Critical("consumeUploadKeyPosition error")
 		}
 	}
 }

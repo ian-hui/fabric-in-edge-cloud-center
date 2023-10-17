@@ -12,7 +12,10 @@ require (
 	github.com/samuel/go-zookeeper v0.0.0-20201211165307-7117e9ea2414
 )
 
-require github.com/IBM/sarama v1.41.2
+require (
+	github.com/IBM/sarama v1.41.2
+	github.com/cloudflare/cfssl v1.6.4
+)
 
 require (
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect

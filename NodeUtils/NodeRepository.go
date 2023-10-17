@@ -5,9 +5,10 @@ import (
 	"crypto/x509"
 	"encoding/json"
 	"fabric-go-sdk/clients"
-	"fmt"
 	"io/ioutil"
 	"strconv"
+
+	"github.com/cloudflare/cfssl/log"
 
 	"github.com/IBM/sarama"
 	_ "github.com/go-kivik/couchdb/v4" // The CouchDB driver
@@ -102,16 +103,14 @@ func GetCenterKafkaAddrInZookeeper() []string {
 }
 
 func ProducerAsyncSending(messages []byte, topic string, kafka_addr string) error {
-	kafka_client, err := clients.GetProducer(kafka_addr)
-	if err != nil {
-		return err
-	}
+	kafka_client := clients.GetProducer(kafka_addr)
 	msg := &sarama.ProducerMessage{}
 	msg.Topic = topic
-	err = AsyncSend2Kafka(kafka_client, msg, messages)
+	err := AsyncSend2Kafka(kafka_client, msg, messages)
 	if err != nil {
 		return err
 	}
+	log.Info("kafka sending success ,address:%v", kafka_addr)
 	return nil
 }
 
@@ -124,10 +123,9 @@ func AsyncSend2Kafka(client sarama.AsyncProducer, msg *sarama.ProducerMessage, c
 	go func() {
 		select {
 		case success := <-client.Successes():
-			fmt.Println("message sent successfully")
-			fmt.Printf("partition:%v offset:%v\n", success.Partition, success.Offset)
+			log.Infof("partition:%v offset:%v topic:%v\n", success.Partition, success.Offset, success.Topic)
 		case err := <-client.Errors():
-			panic(err)
+			log.Critical(err)
 		}
 	}()
 	return nil

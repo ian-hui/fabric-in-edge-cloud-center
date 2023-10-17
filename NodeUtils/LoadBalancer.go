@@ -42,15 +42,15 @@ type loadInfo struct {
 	load float64
 }
 
-func loadbalance(g []string, k int) (gro []string, err error) {
+func loadbalance(g [][]string, k int) (gro []string, err error) {
 	group_load := make([]loadInfo, len(g))
 	for i, addr := range g {
 		//询问每个节点的cpu占用率
-		load, err := httpapi.GetLoadFromGroupNode(addr)
+		load, err := httpapi.GetLoadFromGroupNode(addr[0])
 		if err != nil {
 			return nil, err
 		}
-		group_load[i].addr = addr
+		group_load[i].addr = addr[0]
 		group_load[i].load = load
 	}
 	//对group_load进行排序
